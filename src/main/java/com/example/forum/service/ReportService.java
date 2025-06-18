@@ -22,9 +22,7 @@ public class ReportService {
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
-    /*
-     * DBから取得したデータをFormに設定
-     */
+    //DBから取得したデータ（entity）をFormに設定
     private List<ReportForm> setReportForm(List<Report> results) {
         List<ReportForm> reports = new ArrayList<>();
 
@@ -37,22 +35,33 @@ public class ReportService {
         }
         return reports;
     }
-    /*
-     * レコード追加
-     */
+
+    //レコード追加、編集内容の追加も
     public void saveReport(ReportForm reqReport) {
         Report saveReport = setReportEntity(reqReport);
         reportRepository.save(saveReport);
     }
-
-    /*
-     * リクエストから取得した情報をEntityに設定
-     */
+     //リクエストから取得した情報をEntityに設定
     private Report setReportEntity(ReportForm reqReport) {
         Report report = new Report();
         report.setId(reqReport.getId());
         report.setContent(reqReport.getContent());
         return report;
+    }
+
+    //削除機能追加 deleteReport(id)戻り値なし
+    public void deleteReport(int id) {
+        reportRepository.deleteById(id);
+    }
+
+    //編集機能追加　レコード1件取得
+    public ReportForm editReport(Integer id) {
+        List<Report> results = new ArrayList<>();
+        //findByIdメソッド：Id が一致するレコードを取得。合致するものがなければnullで返す
+        results.add((Report) reportRepository.findById(id).orElse(null));
+        //setReportFormメソッドでFormに詰め替え
+        List<ReportForm> reports = setReportForm(results);
+        return reports.get(0);
     }
 }
 

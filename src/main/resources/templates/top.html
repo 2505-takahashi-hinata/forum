@@ -20,6 +20,21 @@
         <div class="text">
             投稿 : <span th:text="${content.content}"/>
         </div>
+        <!--投稿削除機能追加-->
+        <div class="delete-button">
+            <!--method属性にdelete入れると自動でPOST送信になり、-->
+            <!--input type=”hidden” name=”_method” value=”delete”も自動で入る-->
+            <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
+                <input type="submit" value="削除">
+            </form>
+            <!--編集機能追加-->
+            <div class="edit-button">
+                <a th:href="@{/edit/{id}(id=${content.id})}">
+                    <input type="button" value="編集">
+                </a>
+            </div>
+
+        </div>
     </div>
 </div>
 </body>
