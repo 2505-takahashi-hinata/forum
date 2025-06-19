@@ -1,6 +1,8 @@
 package com.example.forum.controller;
 
+import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
+import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,8 @@ import java.util.List;
 public class ForumController {
     @Autowired
     ReportService reportService;
+    @Autowired
+    CommentService commentService;
 
     /*
      * 投稿内容表示処理
@@ -22,10 +26,18 @@ public class ForumController {
         ModelAndView mav = new ModelAndView();
         // 投稿を全件取得
         List<ReportForm> contentData = reportService.findAllReport();
+        //１コメントを全件取得
+        List<CommentForm> commentData = commentService.findAllComments();
+        //１コメント用空のForm準備
+        CommentForm commentForm = new CommentForm();
         // 画面遷移先を指定
         mav.setViewName("/top");
         // 投稿データオブジェクトを保管
         mav.addObject("contents", contentData);
+        //応用課題１コメントデータオブジェクトを保管
+        mav.addObject("comments", commentData);
+        //応用課題１空のFormを保管
+        mav.addObject("commentForm", commentForm);
         return mav;
     }
     /*
@@ -84,6 +96,39 @@ public class ForumController {
         report.setId(id);
         // 編集した投稿を更新
         reportService.saveReport(report);
+        // rootへリダイレクト
+        return new ModelAndView("redirect:/");
+    }
+
+    //応用課題１コメント機能追加
+    @PostMapping("/addComment")
+    public ModelAndView addComment(@ModelAttribute("commentForm") CommentForm commentForm){
+        // コメントをサービスに渡す
+        commentService.saveComment(commentForm);
+        // rootへリダイレクト
+        return new ModelAndView("redirect:/");
+    }
+
+    //応用課題２コメントの編集
+    //画面遷移
+    @GetMapping("/edit-comment/{id}")
+    public ModelAndView editComment(@PathVariable Integer id) {
+        ModelAndView mav = new ModelAndView();
+        // 編集するコメントを取得
+        CommentForm comment = commentService.editComment(id);
+        // 編集するコメントをセット
+        mav.addObject("formModel", comment);
+        // 画面遷移先を指定
+        mav.setViewName("/edit-comment");
+        return mav;
+    }
+    @PutMapping("/updateComment/{id}")
+    public ModelAndView updateComment (@PathVariable Integer id,
+                                       @ModelAttribute("formModel") CommentForm comment) {
+        // UrlParameterのidを更新するentityにセット
+        comment.setId(id);
+        // 編集した投稿を更新
+        commentService.saveComment(comment);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }

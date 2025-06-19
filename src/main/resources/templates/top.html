@@ -6,36 +6,59 @@
     <title>TOP</title>
 </head>
 <body>
-<div class="header-contents">
-    <h1>匿名掲示板</h1>
-</div>
-<div class="main-contents">
-    <a href="/new">
-        <button class="new-button" type="button">新規投稿</button>
-    </a>
-    <div class="message-icon" th:each="content : ${contents}">
-        <div>
-            ID : <span th:text="${content.id}"/>
-        </div>
-        <div class="text">
-            投稿 : <span th:text="${content.content}"/>
-        </div>
-        <!--投稿削除機能追加-->
-        <div class="delete-button">
-            <!--method属性にdelete入れると自動でPOST送信になり、-->
-            <!--input type=”hidden” name=”_method” value=”delete”も自動で入る-->
-            <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
-                <input type="submit" value="削除">
-            </form>
+    <div class="header-contents">
+        <h1>匿名掲示板</h1>
+    </div>
+    <div class="main-contents">
+        <a href="/new">
+            <button class="new-button" type="button">新規投稿</button>
+        </a>
+        <div class="message-icon" th:each="content : ${contents}">
+            <div>
+                ID : <span th:text="${content.id}"/>
+            </div>
+            <div class="text">
+                投稿 : <span th:text="${content.content}"/>
+            </div>
+            <!--投稿削除機能追加-->
+            <div class="delete-button">
+                <!--method属性にdelete入れると自動でPOST送信になり、-->
+                <!--input type=”hidden” name=”_method” value=”delete”も自動で入る-->
+                <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
+                    <input type="submit" value="削除">
+                </form>
+            </div>
             <!--編集機能追加-->
             <div class="edit-button">
                 <a th:href="@{/edit/{id}(id=${content.id})}">
                     <input type="button" value="編集">
                 </a>
             </div>
-
+            <!--応用課題１コメント機能追加-->
+            <!--投稿ごとにテキストフォーム欄と返信ボタンをつける-->
+            <div class="comment">
+                <form method="post" th:action="@{/addComment}" th:object="${commentForm}">
+                    <div class="form-area">
+                        <label>コメント</label>
+                        <textarea class="tweet-box" th:field="*{text}" size="20" maxlength="200" /></textarea><br/>
+                        <input type="hidden" name="reportId" th:value="${content.id}">
+                        <input type="submit" value="返信" />
+                    </div>
+                </form>
+            </div>
+            <!--コメント表示のループ-->
+            <div class="comment-icon" th:each="comment : ${comments}">
+                <div th:if="${comment.reportId} == ${content.id}">　
+                    コメント：<span th:text="${comment.text}"/><br/>
+                    <!--応用課題２コメント編集機能-->
+                    <div class="edit-button">
+                        <a th:href="@{/edit-comment/{id}(id=${comment.id})}">
+                            <input type="button" value="編集">
+                        </a>
+                    </div>
+                </div>
+            </div>　
         </div>
     </div>
-</div>
 </body>
 </html>
