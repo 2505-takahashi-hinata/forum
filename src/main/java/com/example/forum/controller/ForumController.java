@@ -21,23 +21,27 @@ public class ForumController {
     /*
      * 投稿内容表示処理
      */
+    //@RequestParamはデフォルトではnullを受け付けないため、required=falseを追記。
     @GetMapping
-    public ModelAndView top() {
+    public ModelAndView top(@RequestParam(name="start", required=false) String start,
+                            @RequestParam(name="end", required=false) String end) {
         ModelAndView mav = new ModelAndView();
         // 投稿を全件取得
-        List<ReportForm> contentData = reportService.findAllReport();
-        //１コメントを全件取得
+        // 応用課題４日付で投稿絞込　引数に日付を設定
+        List<ReportForm> contentData = reportService.findAllReport(start, end);
+        //応用課題１コメントを全件取得、コメント用空のForm準備
         List<CommentForm> commentData = commentService.findAllComments();
-        //１コメント用空のForm準備
         CommentForm commentForm = new CommentForm();
         // 画面遷移先を指定
         mav.setViewName("/top");
         // 投稿データオブジェクトを保管
         mav.addObject("contents", contentData);
-        //応用課題１コメントデータオブジェクトを保管
+        //応用課題１コメントデータオブジェクトを保管、空のFormを保管
         mav.addObject("comments", commentData);
-        //応用課題１空のFormを保管
         mav.addObject("commentForm", commentForm);
+        //応用課題４入力した日付をセット（絞込押下後も表示されるように）
+        mav.addObject("start", start);
+        mav.addObject("end", end);
         return mav;
     }
     /*
@@ -122,6 +126,7 @@ public class ForumController {
         mav.setViewName("/edit-comment");
         return mav;
     }
+    //編集処理
     @PutMapping("/updateComment/{id}")
     public ModelAndView updateComment (@PathVariable Integer id,
                                        @ModelAttribute("formModel") CommentForm comment) {
@@ -129,6 +134,15 @@ public class ForumController {
         comment.setId(id);
         // 編集した投稿を更新
         commentService.saveComment(comment);
+        // rootへリダイレクト
+        return new ModelAndView("redirect:/");
+    }
+
+    //応用課題３コメント削除
+    @DeleteMapping("/deleteComment/{id}")
+    public ModelAndView deleteComment(@PathVariable Integer id) {
+        // 投稿をテーブルに格納
+        commentService.deleteComment(id);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }

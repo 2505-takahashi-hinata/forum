@@ -9,7 +9,9 @@ import com.example.forum.repository.entity.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 //応用課題１コメント機能追加
@@ -28,11 +30,12 @@ public class CommentService {
         comment.setId(commentForm.getId());
         comment.setText(commentForm.getText());
         comment.setReportId(commentForm.getReportId());
+        comment.setUpdatedDate(new Date());
         return comment;
     }
     //コメント全件取得
     public List<CommentForm> findAllComments() {
-        List<Comment> results = commentRepository.findAllByOrderByIdAsc();
+        List<Comment> results = commentRepository.findAllByOrderByIdDesc();
         List<CommentForm> comments = setCommentForm(results);
         return comments;
     }
@@ -58,5 +61,10 @@ public class CommentService {
             comments.add(comment);
         }
         return comments;
+    }
+
+    //応用課題３コメントの削除
+    public void deleteComment(int id) {
+        commentRepository.deleteById(id);
     }
 }

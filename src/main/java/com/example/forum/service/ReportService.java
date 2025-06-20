@@ -5,8 +5,12 @@ import com.example.forum.repository.ReportRepository;
 import com.example.forum.repository.entity.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -17,10 +21,34 @@ public class ReportService {
     /*
      * レコード全件取得処理
      */
-    public List<ReportForm> findAllReport() {
-        List<Report> results = reportRepository.findAllByOrderByIdDesc();
-        List<ReportForm> reports = setReportForm(results);
-        return reports;
+    public List<ReportForm> findAllReport(String start, String end) {
+//        List<Report> results = reportRepository.findAllByOrderByIdDesc();
+        //応用課題４日付で投稿絞込 入力あれば時間を追加、無ければデフォルト値を設定
+            if (StringUtils.hasText(start)) {
+                start = start + " 00:00:00";
+            }else {
+                start = "2020-01-01 00:00:00";
+            }
+            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            if (StringUtils.hasText(end)) {
+                end = end + " 23:59:59";
+            }else {
+                Date nowDate = new Date();
+//                SimpleDateFormat now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                end = sdFormat.format(nowDate);
+            }
+            //String→Data型に変換
+        try{
+            Date startDate = sdFormat.parse(start);
+            Date endDate = sdFormat.parse(end);
+
+            List<Report> results = reportRepository.findByCreatedDateBetween(startDate,endDate);
+            List<ReportForm> reports = setReportForm(results);
+            return reports;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return List.of();
     }
     //DBから取得したデータ（entity）をFormに設定
     private List<ReportForm> setReportForm(List<Report> results) {
