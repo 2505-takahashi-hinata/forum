@@ -1,5 +1,6 @@
 package com.example.forum.service;
 
+import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.repository.ReportRepository;
 import com.example.forum.repository.entity.Report;
@@ -10,6 +11,7 @@ import org.springframework.util.StringUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -41,8 +43,13 @@ public class ReportService {
         try{
             Date startDate = sdFormat.parse(start);
             Date endDate = sdFormat.parse(end);
+            //endのデフォルト値を現在時刻＋30分で設定
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, 30);
+            endDate = calendar.getTime();
 
-            List<Report> results = reportRepository.findByCreatedDateBetween(startDate,endDate);
+            //応用課題５降順に変更ORDER BY Updated Date Desc追加
+            List<Report> results = reportRepository.findByUpdatedDateBetweenOrderByUpdatedDateDesc(startDate,endDate);
             List<ReportForm> reports = setReportForm(results);
             return reports;
         } catch (ParseException e) {
@@ -74,6 +81,7 @@ public class ReportService {
         Report report = new Report();
         report.setId(reqReport.getId());
         report.setContent(reqReport.getContent());
+        report.setUpdatedDate(new Date());
         return report;
     }
 
@@ -90,6 +98,14 @@ public class ReportService {
         //setReportFormメソッドでFormに詰め替え
         List<ReportForm> reports = setReportForm(results);
         return reports.get(0);
+    }
+
+    //応用課題５降順に表示　コメントの追加・編集時に投稿のupdateDateも更新
+    public void updateReport(CommentForm commentForm){
+        //id、updatedDateの取得
+        int id = commentForm.getReportId();
+        Date updatedDate = new Date();
+        reportRepository.updateUpdatedDateById(id, updatedDate);
     }
 }
 

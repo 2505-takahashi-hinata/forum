@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -109,6 +110,9 @@ public class ForumController {
     public ModelAndView addComment(@ModelAttribute("commentForm") CommentForm commentForm){
         // コメントをサービスに渡す
         commentService.saveComment(commentForm);
+
+       //投稿のupdatedateを更新
+        reportService.updateReport(commentForm);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
@@ -126,18 +130,19 @@ public class ForumController {
         mav.setViewName("/edit-comment");
         return mav;
     }
-    //編集処理
+    //応用課題３コメント編集処理
     @PutMapping("/updateComment/{id}")
     public ModelAndView updateComment (@PathVariable Integer id,
-                                       @ModelAttribute("formModel") CommentForm comment) {
+                                       @ModelAttribute("formModel") CommentForm commentForm) {
         // UrlParameterのidを更新するentityにセット
-        comment.setId(id);
+        commentForm.setId(id);
         // 編集した投稿を更新
-        commentService.saveComment(comment);
+        commentService.saveComment(commentForm);
+        //投稿のupdatedateを更新
+        reportService.updateReport(commentForm);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
-
     //応用課題３コメント削除
     @DeleteMapping("/deleteComment/{id}")
     public ModelAndView deleteComment(@PathVariable Integer id) {

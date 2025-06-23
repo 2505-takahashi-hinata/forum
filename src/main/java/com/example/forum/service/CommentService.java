@@ -3,6 +3,7 @@ package com.example.forum.service;
 import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.repository.CommentRepository;
+import com.example.forum.repository.ReportRepository;
 import com.example.forum.repository.entity.Comment;
 import com.example.forum.repository.entity.Comment;
 import com.example.forum.repository.entity.Report;
@@ -35,7 +36,7 @@ public class CommentService {
     }
     //コメント全件取得
     public List<CommentForm> findAllComments() {
-        List<Comment> results = commentRepository.findAllByOrderByIdDesc();
+        List<Comment> results = commentRepository.findAllByOrderByUpdatedDateDesc();
         List<CommentForm> comments = setCommentForm(results);
         return comments;
     }

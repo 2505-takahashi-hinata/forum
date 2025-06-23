@@ -24,19 +24,4 @@ public class Report {
     @Column(name = "updated_date", insertable = false, updatable = true)
     private Date updatedDate;
 //Lombok入れたため　getter,setter省略
-//    public int getId() {
-//        return id;
-//    }
-//
-//    public void setId(int id) {
-//        this.id = id;
-//    }
-//
-//    public String getContent() {
-//        return content;
-//    }
-//
-//    public void setContent(String content) {
-//        this.content = content;
-//    }
 }
