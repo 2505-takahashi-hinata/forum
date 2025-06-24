@@ -20,7 +20,7 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
 
     //応用課題５降順に表示　IDに紐づくupdateDateのみ更新
     @Modifying
-    @Query("update report t set t.updatedDate = :updatedDate where t.id = :id")
-    public void updateUpdatedDateById(@Param("id") Integer id, @Param("updatedDate") Date updatedDate);
+    @Query("update Report t set t.updatedDate = :updatedDate where t.id = :id")
+    public void save(@Param("id") Integer id, @Param("updatedDate") Date updatedDate);
 }
 

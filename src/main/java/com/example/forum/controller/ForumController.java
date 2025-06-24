@@ -4,8 +4,12 @@ import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,6 +22,8 @@ public class ForumController {
     ReportService reportService;
     @Autowired
     CommentService commentService;
+    @Autowired
+    HttpSession session;
 
     /*
      * 投稿内容表示処理
@@ -43,6 +49,10 @@ public class ForumController {
         //応用課題４入力した日付をセット（絞込押下後も表示されるように）
         mav.addObject("start", start);
         mav.addObject("end", end);
+        //応用課題６バリデーション　コメントのバリデーション
+        mav.addObject("message", session.getAttribute("message"));
+        mav.addObject("reportId", session.getAttribute("reportId"));
+        session.invalidate();
         return mav;
     }
     /*
@@ -60,10 +70,17 @@ public class ForumController {
         return mav;
     }
     /*
-     * 新規投稿処理
+     * 新規投稿処理　　応用課題６バリデーション追記
      */
     @PostMapping("/add")
-    public ModelAndView addContent(@ModelAttribute("formModel") ReportForm reportForm){
+    public ModelAndView addContent(@ModelAttribute("formModel") @Valid ReportForm reportForm, BindingResult result){
+        //未入力の場合エラーメッセジをセット
+        ModelAndView mav = new ModelAndView();
+        if (result.hasErrors()) {
+            mav.setViewName("/new");
+            mav.addObject("message", "投稿内容を入力してください");
+            return mav;
+        }
         // 投稿をテーブルに格納
         reportService.saveReport(reportForm);
         // rootへリダイレクト
@@ -93,10 +110,17 @@ public class ForumController {
         mav.setViewName("/edit");
         return mav;
     }
-    //編集処理の実行
+    //編集処理の実行　　応用課題６バリデーション追記
     @PutMapping("/update/{id}")
     public ModelAndView updateContent (@PathVariable Integer id,
-                                       @ModelAttribute("formModel") ReportForm report) {
+                                       @ModelAttribute("formModel") @Valid ReportForm report, BindingResult result) {
+        //未入力の場合エラーメッセジをセット
+        ModelAndView mav = new ModelAndView();
+        if (result.hasErrors()) {
+            mav.setViewName("/edit");
+            mav.addObject("message", "投稿内容を入力してください");
+            return mav;
+        }
         // UrlParameterのidを更新するentityにセット
         report.setId(id);
         // 編集した投稿を更新
@@ -105,14 +129,21 @@ public class ForumController {
         return new ModelAndView("redirect:/");
     }
 
-    //応用課題１コメント機能追加
+    //応用課題１コメント機能追加　　応用課題６バリデーション追記
     @PostMapping("/addComment")
-    public ModelAndView addComment(@ModelAttribute("commentForm") CommentForm commentForm){
-        // コメントをサービスに渡す
-        commentService.saveComment(commentForm);
-
-       //投稿のupdatedateを更新
-        reportService.updateReport(commentForm);
+    public ModelAndView addComment(@ModelAttribute("commentForm") @Valid CommentForm commentForm, BindingResult result){
+        //未入力の場合エラーメッセジをセット
+        ModelAndView mav = new ModelAndView();
+        if (result.hasErrors()) {
+            session.setAttribute("message", "コメントを入力してください");
+            session.setAttribute("reportId", commentForm.getReportId());
+            return new ModelAndView("redirect:/");
+        } else {
+            // コメントをサービスに渡す
+            commentService.saveComment(commentForm);
+            //投稿のupdatedateを更新
+            reportService.updateReport(commentForm);
+        }
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
@@ -130,10 +161,17 @@ public class ForumController {
         mav.setViewName("/edit-comment");
         return mav;
     }
-    //応用課題３コメント編集処理
+    //応用課題３コメント編集処理  応用課題６バリデーション追記
     @PutMapping("/updateComment/{id}")
     public ModelAndView updateComment (@PathVariable Integer id,
-                                       @ModelAttribute("formModel") CommentForm commentForm) {
+                                       @ModelAttribute("formModel") @Valid CommentForm commentForm, BindingResult result) {
+        //未入力の場合エラーメッセジをセット
+        ModelAndView mav = new ModelAndView();
+        if (result.hasErrors()) {
+            mav.setViewName("/edit-comment");
+            mav.addObject("message", "コメントを入力してください");
+            return mav;
+        }
         // UrlParameterのidを更新するentityにセット
         commentForm.setId(id);
         // 編集した投稿を更新

@@ -13,6 +13,8 @@
   <form method="post" action="/add" th:object="${formModel}">
     <div class="form-area">
       <label>投稿内容</label>
+      <!--応用課題６バリデーション-->
+      <div class="errorMessages" th:each="message : ${message}" th:text="${message}"></div>
       <textarea class="tweet-box" th:field="*{content}" size="20" maxlength="200" /></textarea><br/>
       <input type="submit" value="投稿" />
     </div>

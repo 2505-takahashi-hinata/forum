@@ -105,7 +105,7 @@ public class ReportService {
         //id、updatedDateの取得
         int id = commentForm.getReportId();
         Date updatedDate = new Date();
-        reportRepository.updateUpdatedDateById(id, updatedDate);
+        reportRepository.save(id, updatedDate);
     }
 }
 

@@ -46,6 +46,10 @@
                 <form method="post" th:action="@{/addComment}" th:object="${commentForm}">
                     <div class="form-area">
                         <label>コメント</label>
+                        <!--応用課題６バリデーション-->
+                        <div th:if="${reportId == content.id}">
+                            <div class="errorMessages" th:each="message : ${message}" th:text="${message}"></div>
+                        </div>
                         <textarea class="tweet-box" th:field="*{text}" size="20" maxlength="200" /></textarea><br/>
                         <input type="hidden" name="reportId" th:value="${content.id}">
                         <input type="submit" value="返信" />
